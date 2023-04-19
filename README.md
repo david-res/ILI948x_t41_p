@@ -76,5 +76,5 @@ Register a callback to trigger when the DMA transfer completes - ONLY ON DMA MET
 ```
 ILI948x_t41_p::onCompleteCB(CBF callback);
 ```
-![Image of TFT with Teensy MM image](https://github.com/david-res/ILI948x_t41_p/blob/master/mm_flexio_example.jpg)
+![Image of TFT with Teensy MM image](https://github.com/david-res/ILI948x_t41_p/blob/main/mm_flexio_example.jpg)
 
