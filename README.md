@@ -19,7 +19,7 @@ First include the library and create a constructor:
 #define RST 12
 ILI948x_t41_p lcd = ILI948x_t41_p(DC,CS,RST);
 ```
-You can use and GPIO pins for CS, DC and RST
+You can use any GPIO pins for CS, DC and RST
 
 Next, wire up your LCD - use Teensy pins:
 * D0 - pin 19
