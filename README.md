@@ -73,7 +73,7 @@ Invert display color (true/false)
 ILI948x_t41_p::invertDisplay(bool);
 ```
 
-Register a callback to trigger when the DMA transfer completes - ONLY ON DMA METHOD
+Register a callback to trigger when the Async transfer completes.
 ```
 ILI948x_t41_p::onCompleteCB(CBF callback);
 ```
