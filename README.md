@@ -30,8 +30,9 @@ Next, wire up your LCD - use Teensy pins:
 * D5 - pin 41
 * D6 - pin 17
 * D7 - pin 16
-* WR -pin 36
-* RD - pin37 or 3.3v if no read command is needed
+
+* WR - pin 36
+* RD - pin 37 or 3.3v if no read command is needed
    
 
 
