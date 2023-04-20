@@ -19,8 +19,6 @@
 #define BYTES_PER_BURST (sizeof(uint32_t)*SHIFTNUM)
 #define SHIFTER_IRQ (SHIFTNUM-1)
 #define TIMER_IRQ 0
-#define FLEXIO_BASE_CLOCK 120000000UL
-#define SHIFT_CLOCK_DIVIDER 10
 #define FLEXIO_ISR_PRIORITY 64 // interrupt is timing sensitive, so use relatively high priority (supersedes USB)
 
 
@@ -105,7 +103,7 @@
 class ILI948x_t41_p {
   public:
     ILI948x_t41_p(int8_t dc, int8_t cs = -1, int8_t rst = -1);
-    void begin(uint8_t buad_div = 20);
+    void begin(uint8_t baud_div = 20);
     uint8_t getBusSpd();
 
 
@@ -129,9 +127,6 @@ class ILI948x_t41_p {
     void pushPixels16bit(const uint16_t * pcolors, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
     void pushPixels16bitAsync(const uint16_t * pcolors, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
     
-    //void pushPixels16bitTearing(uint16_t * pcolors, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2 );
-    //void pushPixels24bitTearing(uint16_t * pcolors, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2 );
-    void DMAerror();
 
     typedef void(*CBF)();
     CBF _callback;
@@ -143,7 +138,7 @@ class ILI948x_t41_p {
   IMXRT_FLEXIO_t *p;
   const FlexIOHandler::FLEXIO_Hardware_t *hw;
    
-    uint8_t _buad_div = 20; 
+    uint8_t _baud_div = 20; 
 
     uint8_t _bitDepth = 16;
     uint8_t _rotation = 0;
@@ -172,7 +167,6 @@ class ILI948x_t41_p {
     volatile unsigned int bursts_to_complete;
     volatile uint32_t *readPtr;
     uint32_t finalBurstBuffer[SHIFTNUM];
-    volatile bool pendingTransfer = false;
 
     void displayInit();
     void CSLow();
