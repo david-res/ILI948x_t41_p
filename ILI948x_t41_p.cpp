@@ -54,7 +54,6 @@ FLASHMEM void ILI948x_t41_p::begin(uint8_t baud_div)
   delay(100);
 
   FlexIO_Init();
-
   displayInit();
   /*
   setBitDepth(_bitDepth);
@@ -93,6 +92,7 @@ FLASHMEM uint8_t ILI948x_t41_p::setBitDepth(uint8_t bitDepth)
   }
  
   SglBeatWR_nPrm_8(ILI9488_COLMOD, &bd, 1);
+  SglBeatWR_nPrm_8(ILI9488_COLMOD, 0x55, 1);
 
   //Insert small delay here as rapid calls appear to fail
   delay(10);
@@ -265,113 +265,65 @@ FASTRUN void ILI948x_t41_p::pushPixels16bitAsync(const uint16_t * pcolors, uint1
 ///////////////////
 //Private functions
 ///////////////////
+PROGMEM static const uint8_t initCommands[] = 
+{
+  ILI9488_PWCTR1,     2, 0x19, 0x1A,              // Power Control 1
+  ILI9488_PWCTR2,     2, 0x45, 0X00,              // Power Control 2
+  ILI9488_PWCTR3,     1, 0x33,                    // Power Control 3 (For Normal Mode)
+	ILI9488_VMCTR1,     3, 0x00, 0x12, 0x80,        // VCOM control
+	ILI9488_INVCTR,     1, 0x02,                    // Display Inversion Control
+	ILI9488_DFUNCTR,    3, 0x00, 0x02, 0x3B,	      // Display Function Control  RGB/MCU Interface Control
+	ILI9488_ETMOD,      1, 0x07,                    // Entry Mode Set
+  // Gamma Setting	   
+  ILI9488_PGAMCTRL,  15, 0x00, 0x03, 0x09, 0x08, 0x16, 0x0A, 0x3F, 0x78, 0x4C, 0x09, 0x0A, 0x08, 0x16, 0x1A, 0x0F,
+	ILI9488_NGAMCTRL,  15, 0x00, 0x16, 0x19, 0x03, 0x0F, 0x05, 0x32, 0x45, 0x46, 0x04, 0x0E, 0x0D, 0x35, 0x37, 0x0F,
+  // Other commands  
+ 	ILI9488_MADCTL,     1, 0x48,                    // Memory Access Control : 0x48 is equivalent to _rotation = 0
+  ILI9488_COLMOD,     1, 0x55,                    // Set bit depth to 16-bit (RGB565)
+	0
+};
+
 FLASHMEM void ILI948x_t41_p::displayInit() 
 {
-  uint8_t Command;
-  uint8_t CommandValue[25];
-    Command = 0x01; //SW RST
-    SglBeatWR_nPrm_8(Command,0 ,0);
-    delay(120);
-    
-    Command = 0x11; //Exit sleep
-    SglBeatWR_nPrm_8(Command ,0 ,0);
+  if (_rst > -1) {
+    //Hardware reset
+    digitalWriteFast(_rst, HIGH);
+    delay(15); 
+    digitalWriteFast(_rst, LOW);
     delay(15);
-    Command = 0x28; //Display Off
-    SglBeatWR_nPrm_8(Command ,0 ,0);
+    digitalWriteFast(_rst, HIGH);
     delay(15);
-   
-   
-    Command = 0xC0; // Power Control 1
-    CommandValue[0U] = 0x19;
-    CommandValue[1U] = 0x1A;
-    SglBeatWR_nPrm_8(Command, CommandValue, 2U);
+  } else {
+    //Software reset
+    CSLow(); 
+    SglBeatWR_nPrm_8(ILI9488_SWRESET, 0 , 0);
+    delay(120); 
+    CSHigh(); 
+  }
+
+  CSLow(); 
+  SglBeatWR_nPrm_8(ILI9488_SLPOUT, 0 , 0);
+  delay(15);
+  SglBeatWR_nPrm_8(ILI9488_DISPOFF, 0 , 0);
 
   
-    Command = 0xC1; // Power Control 2
-    CommandValue[0U] = 0x45;
-    CommandValue[1U] = 0x00;
-    SglBeatWR_nPrm_8(Command, CommandValue, 2U);
-    Command = 0xC2; // Power Control 3
-    CommandValue[0U] = 0x33;
-    SglBeatWR_nPrm_8(Command, CommandValue, 1U);
+  delay(15); 
 
-    Command = 0xC5; // VCOM control
-    CommandValue[0U] = 0x00;
-    CommandValue[1U] = 0x12;
-    CommandValue[2U] = 0x80;
-    SglBeatWR_nPrm_8(Command, CommandValue, 3U);
+  uint8_t * commands = initCommands;
+  uint8_t cmd, x, numArgs;
+  while((cmd = *commands++) > 0) {
+    x = *commands++;
+    numArgs = x & 0x7F;
+    SglBeatWR_nPrm_8(cmd, commands , numArgs);
+    commands += numArgs;
+  }
 
-    Command = 0xB4; // Display Inversion Control
-    CommandValue[0U] = 0x02;
-    SglBeatWR_nPrm_8(Command, CommandValue, 1U);
+  SglBeatWR_nPrm_8(ILI9488_DISPON, 0 , 0);
+  delay(15); 
 
-    Command = 0xB6; // Display Function Control  RGB/MCU Interface Control
-    CommandValue[0U] = 0x00;
-    CommandValue[1U] = 0x02;
-    CommandValue[2U] = 0x3B;
-    SglBeatWR_nPrm_8(Command, CommandValue, 3U);
-
-    Command = 0xB7; // Entry Mode Set
-    CommandValue[0U] = 0x07;
-    SglBeatWR_nPrm_8(Command, CommandValue, 1U);
-
-    Command = 0xE0; // Gamma Setting  
-    CommandValue[0U] = 0x00;
-    CommandValue[1U] = 0x03;
-    CommandValue[2U] = 0x09;
-    CommandValue[3U] = 0x08;
-    CommandValue[4U] = 0x16;
-    CommandValue[5U] = 0x0A;
-    CommandValue[6U] = 0x3F;
-    CommandValue[7U] = 0x78;
-    CommandValue[8U] = 0x4C;
-    CommandValue[9U] = 0x09;
-    CommandValue[10U] = 0x0A;
-    CommandValue[11U] = 0x08;
-    CommandValue[12U] = 0x16;
-    CommandValue[13U] = 0x1A;
-    CommandValue[14U] = 0x0F;
-    SglBeatWR_nPrm_8(Command, CommandValue, 15U);
-
-    Command = 0xE1; // Negative Gamma Setting  
-    CommandValue[0U] = 0x00;
-    CommandValue[1U] = 0x16;
-    CommandValue[2U] = 0x19;
-    CommandValue[3U] = 0x03;
-    CommandValue[4U] = 0x0F;
-    CommandValue[5U] = 0x05;
-    CommandValue[6U] = 0x32;
-    CommandValue[7U] = 0x45;
-    CommandValue[8U] = 0x46;
-    CommandValue[9U] = 0x04;
-    CommandValue[10U] = 0x0E;
-    CommandValue[11U] = 0x0D;
-    CommandValue[12U] = 0x35;
-    CommandValue[13U] = 0x37;
-    CommandValue[14U] = 0x0F;
-    SglBeatWR_nPrm_8(Command, CommandValue, 15U);
-
-    Command = 0x36; // Memory Access Control
-    CommandValue[0U] = 0x48;
-    SglBeatWR_nPrm_8(Command, CommandValue, 1U);
-
-    //delay(10);
-    Command = 0x29; // Display On
-    SglBeatWR_nPrm_8(Command,0 ,0);
-    delay(15);
-
-    Command = 0x3A; // Set bit depth
-    CommandValue[0U] = 0x55;
-    SglBeatWR_nPrm_8(Command, CommandValue, 1U);
-
-    Command = 0x36; // Set rotation
-    CommandValue[0U] = 0x40|0x80|0x20|0x08; //Landscape
-    SglBeatWR_nPrm_8(Command, CommandValue, 1U);
-    
-
-    delay(120);
-    Serial.println("ILI9488 Initialized");
+  CSHigh();
 }
+
 
 FASTRUN void ILI948x_t41_p::CSLow() 
 {
@@ -869,7 +821,7 @@ FASTRUN void ILI948x_t41_p::MulBeatWR_nPrm_IRQ(uint32_t const cmd,  const void *
 
     FlexIO_Config_MultiBeat();
     WR_IRQTransferDone = false;
-    uint32_t bytes = length*2;
+    uint32_t bytes = length*2U;
 
     bursts_to_complete = bytes / BYTES_PER_BURST;
 
@@ -882,7 +834,8 @@ FASTRUN void ILI948x_t41_p::MulBeatWR_nPrm_IRQ(uint32_t const cmd,  const void *
 
     bytes_remaining = bytes;
     readPtr = (uint32_t*)value;
-    Serial.printf("START::bursts_to_complete: %d bytes_remaining: %d \n", bursts_to_complete, bytes_remaining);
+    //Serial.printf ("arg addr: %x, readPtr addr: %x \n", value, readPtr);
+    //Serial.printf("START::bursts_to_complete: %d bytes_remaining: %d \n", bursts_to_complete, bytes_remaining);
   
     uint8_t beats = SHIFTNUM * BEATS_PER_SHIFTER;
     p->TIMCMP[0] = ((beats * 2U - 1) << 8) | (_baud_div / 2U - 1U);
@@ -933,6 +886,7 @@ FASTRUN void ILI948x_t41_p::flexIRQ_Callback(){
             readPtr = finalBurstBuffer;
             bytes_remaining = 0;
             for (int i = 0; i < SHIFTNUM; i++) {
+                //p->SHIFTBUFBYS[i] = *readPtr++;
                 p->SHIFTBUFBYS[i] = *readPtr++;
             }
         } else {
