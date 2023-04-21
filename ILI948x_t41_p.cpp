@@ -885,14 +885,13 @@ FASTRUN void ILI948x_t41_p::flexIRQ_Callback(){
             readPtr = finalBurstBuffer;
             bytes_remaining = 0;
             for (int i = 0; i < SHIFTNUM; i++) {
-                //p->SHIFTBUFBYS[i] = *readPtr++;
                 uint32_t data = *readPtr++;
                 p->SHIFTBUFBYS[i] = ((data >> 16) & 0xFFFF) | ((data << 16) & 0xFFFF0000);
             }
         } else {
             bytes_remaining -= BYTES_PER_BURST;
             for (int i = 0; i < SHIFTNUM; i++) {
-                uint32_t data =* readPtr++;
+                uint32_t data = *readPtr++;
                 p->SHIFTBUFBYS[i] = ((data >> 16) & 0xFFFF) | ((data << 16) & 0xFFFF0000);
         }
     }
