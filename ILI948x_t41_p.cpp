@@ -92,7 +92,6 @@ FLASHMEM uint8_t ILI948x_t41_p::setBitDepth(uint8_t bitDepth)
   }
  
   SglBeatWR_nPrm_8(ILI9488_COLMOD, &bd, 1);
-  SglBeatWR_nPrm_8(ILI9488_COLMOD, 0x55, 1);
 
   //Insert small delay here as rapid calls appear to fail
   delay(10);
@@ -309,7 +308,7 @@ FLASHMEM void ILI948x_t41_p::displayInit()
   
   delay(15); 
 
-  uint8_t * commands = initCommands;
+  uint8_t * commands = (uint8_t*)initCommands;
   uint8_t cmd, x, numArgs;
   while((cmd = *commands++) > 0) {
     x = *commands++;
