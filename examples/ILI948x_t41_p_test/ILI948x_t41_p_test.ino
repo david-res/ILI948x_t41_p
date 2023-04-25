@@ -1,5 +1,5 @@
 #include "ILI948x_t41_p.h"
-#include "flexio_teensy_mm.c"
+#include "teensy41.c"
 ILI948x_t41_p lcd = ILI948x_t41_p(10,8,9); //(dc, cs, rst)
 
 const uint16_t screenWidth = 480;
@@ -23,8 +23,8 @@ void setup() {
 
 void loop() {
 
-  lcd.pushPixels16bit(flexio_teensy_mm,0,0,479,319); // 480x320
+  lcd.pushPixels16bit(teensy41,0,0,479,319); // 480x320
   delay(1000);
-  lcd.pushPixels16bitAsync(flexio_teensy_mm,0,0,479,319); // 480x320
+  lcd.pushPixels16bitAsync(teensy41,0,0,479,319); // 480x320
   delay(1000);
 }

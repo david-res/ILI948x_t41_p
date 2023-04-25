@@ -788,36 +788,6 @@ FASTRUN void ILI948x_t41_p::MulBeatWR_nPrm_IRQ(uint32_t const cmd,  const void *
     microSecondDelay();
 
 
-  if (length < 31){
-    //Serial.println ("In DMA but to Short to multibeat");
-    const uint16_t * newValue = (uint16_t*)value;
-    uint16_t buf;
-    for(uint32_t i=0; i<length; i++)
-      {
-        buf = *newValue++;
-          while(0 == (p->SHIFTSTAT & (1U << 0)))
-          {
-          }
-          p->SHIFTBUF[0] = buf >> 8;
-
-
-          while(0 == (p->SHIFTSTAT & (1U << 0)))
-          {
-          }
-          p->SHIFTBUF[0] = buf & 0xFF;
-          
-      }        
-      //Wait for transfer to be completed 
-      while(0 == (p->TIMSTAT & (1U << 0)))
-      {
-      }
-
-    microSecondDelay();
-    CSHigh();
-  }
-
-  else{
-
     FlexIO_Config_MultiBeat();
     WR_IRQTransferDone = false;
     uint32_t bytes = length*2U;
@@ -846,8 +816,6 @@ FASTRUN void ILI948x_t41_p::MulBeatWR_nPrm_IRQ(uint32_t const cmd,  const void *
     // enable interrupts to trigger bursts
     p->TIMIEN |= (1 << TIMER_IRQ);
     p->SHIFTSIEN |= (1 << SHIFTER_IRQ);
-    
-  }
     
 }
 
