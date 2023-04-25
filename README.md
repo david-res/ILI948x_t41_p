@@ -77,5 +77,5 @@ Register a callback to trigger when the Async transfer completes.
 ```
 ILI948x_t41_p::onCompleteCB(CBF callback);
 ```
-![Image of TFT with Teensy MM image](https://github.com/david-res/ILI948x_t41_p/blob/main/mm_flexio_example.jpg)
+![Image of TFT with Teensy 4.1 image](https://github.com/david-res/ILI948x_t41_p/blob/main/teensy41_flexio_example.jpg)
 
