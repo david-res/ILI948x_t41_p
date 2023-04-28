@@ -126,6 +126,7 @@ class ILI948x_t41_p {
 
     void pushPixels16bit(const uint16_t * pcolors, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
     void pushPixels16bitAsync(const uint16_t * pcolors, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
+    uint8_t readCommand(const uint8_t cmd);
     
 
     typedef void(*CBF)();
@@ -184,8 +185,6 @@ class ILI948x_t41_p {
     void SglBeatWR_nPrm_8(uint32_t const cmd, uint8_t const *value , uint32_t const length);
     void SglBeatWR_nPrm_16(uint32_t const cmd, const uint16_t *value, uint32_t const length);
     void MulBeatWR_nPrm_IRQ(uint32_t const cmd,  const void *value, uint32_t const length);
-
-    void SglBeatRD_nPrm_8(uint32_t const cmd, uint8_t const *value , uint32_t const length);
     
     void microSecondDelay();
 
