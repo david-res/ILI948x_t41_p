@@ -413,6 +413,17 @@ FASTRUN void ILI948x_t41_p::FlexIO_Init()
     *(portControlRegister(17)) = 0xFF;
     *(portControlRegister(16)) = 0xFF;
 
+    #if (BUS_WIDTH == 16)
+    *(portControlRegister(22)) = 0xFF;
+    *(portControlRegister(23)) = 0xFF;
+    *(portControlRegister(20)) = 0xFF;
+    *(portControlRegister(21)) = 0xFF;
+    *(portControlRegister(38)) = 0xFF;
+    *(portControlRegister(39)) = 0xFF;
+    *(portControlRegister(26)) = 0xFF;
+    *(portControlRegister(27)) = 0xFF;
+    #endif
+
     /* Set clock */
     pFlex->setClockSettings(3, 1, 0); // (480 MHz source, 1+1, 1+0) >> 480/2/1 >> 240Mhz
 
@@ -428,6 +439,17 @@ FASTRUN void ILI948x_t41_p::FlexIO_Init()
     pFlex->setIOPinToFlexMode(41);
     pFlex->setIOPinToFlexMode(17);
     pFlex->setIOPinToFlexMode(16);
+
+    #if (BUS_WIDTH == 16)
+    pFlex->setIOPinToFlexMode(22);
+    pFlex->setIOPinToFlexMode(23);
+    pFlex->setIOPinToFlexMode(20);
+    pFlex->setIOPinToFlexMode(21);
+    pFlex->setIOPinToFlexMode(38);
+    pFlex->setIOPinToFlexMode(39);
+    pFlex->setIOPinToFlexMode(26);
+    pFlex->setIOPinToFlexMode(27);
+    #endif
     /* Enable the clock */
     hw->clock_gate_register |= hw->clock_gate_mask  ;
     /* Enable the FlexIO with fast access */
