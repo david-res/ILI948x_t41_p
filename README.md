@@ -3,8 +3,8 @@
 
 **Disclaimer: This is an experimental library, currently a WIP. I cannot guarantee that all functions will work nor can I guarantee that this library will work with other libraries. Use at your own risk**  
 
-This library can communicate with an ILI9488 TFT LCD via an 8 bit parallel interface (8080)
-It utilizes FlexIO  to write data to the screen while. 
+This library can communicate with an ILI9488 TFT LCD via an 8 bit or 16 bit parallel interface (8080)
+It utilizes FlexIO to write data to the screen while. 
 The basic method is a blocking tranfser eg the application has to wait for the image to be transferred in order to continue running.
 There is a semi-async method as well that can transfer 32 bytes of data at a time using the FlexIO interrupt feature. While this is not fully async, it can ease off some load from the MCU while transferring the image.
 
@@ -17,8 +17,12 @@ First include the library and create a constructor:
 #define CS 11
 #define DC 13
 #define RST 12
-ILI948x_t41_p lcd = ILI948x_t41_p(DC,CS,RST);
+ILI948x_t41_p lcd = ILI948x_t41_p(DISPLAY_TYPE,DC,CS,RST);
 ```
+The available display types at the moment are:
+* ILI9488_DISP
+
+Other displays will be supported soon (R61529, ILI9486, ILI9806g etc)
 You can use any GPIO pins for CS, DC and RST
 
 Next, wire up your LCD - use Teensy pins:
@@ -31,10 +35,20 @@ Next, wire up your LCD - use Teensy pins:
 * D6 - pin 17
 * D7 - pin 16
 
+* D8 - pin 22
+* D9 - pin 23
+* D10 - pin 20
+* D11 - pin 21
+* D12 - pin 38
+* D13 - pin 39
+* D15 - pin 26
+* D15 - pin 27
+
 * WR - pin 36
 * RD - pin 37 or 3.3v if no read command is needed
    
-
+If you are using an 8 bit bus, in the .h file set BUS_WIDTH 8 
+If you are using a 16 bit bus, in the .h file set BUS_WIDTH 16
 
 in the setup function call:
 ```

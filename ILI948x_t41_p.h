@@ -1,16 +1,11 @@
 #ifndef _ILI948x_t41_p_H_
 #define _ILI948x_t41_p_H_
 
-// uncomment below the line corresponding to your screen:
-
-//#define ILI9481_1
-//#define ILI9481_2
-//#define ILI9486
-#define ILI9488
-//#define R61529
 
 #include "Arduino.h"
 #include "FlexIO_t4.h"
+
+#define BUS_WIDTH 8   /*Available options are 8 or 16 */
 
 
 #define SHIFTNUM 8 // number of shifters used (up to 8)
@@ -100,9 +95,29 @@
 #define MADCTL_ARRAY { MADCTL_MX | MADCTL_BGR, MADCTL_MV | MADCTL_BGR, MADCTL_MY | MADCTL_BGR, MADCTL_MX | MADCTL_MY | MADCTL_MV | MADCTL_BGR } // ILI9488/9486
 
 #ifdef __cplusplus
+
+PROGMEM const uint8_t ILI9488_DISP[] = 
+{
+  ILI9488_PWCTR1,     2, 0x19, 0x1A,              // Power Control 1
+  ILI9488_PWCTR2,     2, 0x45, 0X00,              // Power Control 2
+  ILI9488_PWCTR3,     1, 0x33,                    // Power Control 3 (For Normal Mode)
+	ILI9488_VMCTR1,     3, 0x00, 0x12, 0x80,        // VCOM control
+	ILI9488_INVCTR,     1, 0x02,                    // Display Inversion Control
+	ILI9488_DFUNCTR,    3, 0x00, 0x02, 0x3B,	      // Display Function Control  RGB/MCU Interface Control
+	ILI9488_ETMOD,      1, 0x07,                    // Entry Mode Set
+  // Gamma Setting	   
+  ILI9488_PGAMCTRL,  15, 0x00, 0x03, 0x09, 0x08, 0x16, 0x0A, 0x3F, 0x78, 0x4C, 0x09, 0x0A, 0x08, 0x16, 0x1A, 0x0F,
+	ILI9488_NGAMCTRL,  15, 0x00, 0x16, 0x19, 0x03, 0x0F, 0x05, 0x32, 0x45, 0x46, 0x04, 0x0E, 0x0D, 0x35, 0x37, 0x0F,
+  // Other commands  
+ 	ILI9488_MADCTL,     1, 0x48,                    // Memory Access Control : 0x48 is equivalent to _rotation = 0
+  ILI9488_COLMOD,     1, 0x55,                    // Set bit depth to 16-bit (RGB565)
+	0
+};
+
+
 class ILI948x_t41_p {
   public:
-    ILI948x_t41_p(int8_t dc, int8_t cs = -1, int8_t rst = -1);
+    ILI948x_t41_p(const uint8_t * init_commands, int8_t dc, int8_t cs = -1, int8_t rst = -1);
     void begin(uint8_t baud_div = 20);
     uint8_t getBusSpd();
 
@@ -132,6 +147,9 @@ class ILI948x_t41_p {
     typedef void(*CBF)();
     CBF _callback;
     void onCompleteCB(CBF callback);
+
+
+  
     
   private:
 
@@ -152,6 +170,7 @@ class ILI948x_t41_p {
 
     int16_t _width, _height;
     int8_t  _dc, _cs, _rst;
+    const uint8_t * _init_commands;
 
     uint8_t _dummy;
     uint8_t _curMADCTL;
